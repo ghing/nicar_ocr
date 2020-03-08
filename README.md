@@ -1,6 +1,6 @@
 # Using OCR to extract data from PDFs
 
-A tutorial on extracting text from PDFs and optical character recognition using tesseract, ImageMagick and other open source tools.
+A tutorial on extracting text from PDFs and optical character recognition (OCR) using tesseract, ImageMagick and other open source tools.
 
 This is based on the [tutorial](https://github.com/chadday/nicar_ocr) by Chad Day and updated for the Windows PC labs at NICAR 2020.
 
@@ -8,6 +8,7 @@ This is based on the [tutorial](https://github.com/chadday/nicar_ocr) by Chad Da
 
 This class seeks to help you solve a common problem in journalism: Data stored in a computer generated PDF or even worse an image PDF. We'll first walk through how to do some quick text extraction using a command line tool. Then we'll step up to Optical Character Recognition, or OCR, to work on image files.
 
+While desktop applications such as Adobe Acrobat Pro can do OCR and tools like Tabula can extract tabular data, it's good to be comfortable with command-line tools if you want to a different tool if your go-to produces poor results on a particular PDF, if you need to scale up your PDF processing to a large number of documents or if you want to integrate these tools as part of a more complex processing pipeline.
 
 ## Some conventions
 
@@ -18,6 +19,21 @@ We'll use emoji to indicate different kinds of information.
 - 🖥: Run this version of the command if you're on a Windows machine.
 - 📕: Don't run the command in this cell. It's just an example for reference.
 
+## Assumptions
+
+- Some comfort with working with the command-line. If you want to better learn the command-line see some of the links in the [resources](#resources) section.
+- The tools are installed on your system. See the [installation instructions](#installation) for how to do this if you're trying to walk through this tutorial outside of the NICAR labs.
+
+## Thinking about the command-line
+
+Command-line tools are really different from desktop applicatons. While desktop applications bundle together lots of different functionality into one program, command-line applications try to do one thing and only one thing well. We build functionality by combining command-line tools, using the output of one into the output of another.
+
+All of the options and arguments available to command-line tools can be intimidating, and can make for some pretty long command strings. It's helpful to think about them as the equivalent of the pull-down menus, sliders and checkboxes in a dialog window in a desktop applications. In many cases, you'll just copy and paste the same options every time you run the program. In other cases, you'll need to change the arguments, for things like input and output file names.
+
+Command-line tools don't give you a lot of feedback when the they work as expected. In most cases, no news is good news.
+
+With command-line tools, spaces and capitalization matter. If you run into errors, check that you've retypted the command correctly, or try copying and pasting.
+
 ## The tools 
 
 We're using a number of open source software tools to process our PDFS:
@@ -26,9 +42,9 @@ We're using a number of open source software tools to process our PDFS:
 
 * [tesseract](https://github.com/tesseract-ocr/tesseract/wiki) is our OCR engine. It was first developed by HP but for the last decade or so it's been maintained by Google.
 
-* [ImageMagick](http://www.imagemagick.org/script/command-line-processing.php) is an open source image processing and conversion power tool.
+* [ImageMagick](http://www.imagemagick.org/script/command-line-processing.php) is an open source image processing and conversion power tool. You can think of it like a command-line photoshop. In this tutorial, we'll be using the `convert` command. As I mentioned earlier, command-line tools do one thing and one thing only, so the command is sort of like the "save as" functionality of Photoshop.
 
-* [Ghostscript](https://www.ghostscript.com/index.html) is an interpreter for PDFs and Adobe's PostScript language.
+* [Ghostscript](https://www.ghostscript.com/index.html) is an interpreter for PDFs and Adobe's PostScript language. We don't use it directly, but it can be needed by some of the other tools.
 
 ## Files
 
@@ -439,21 +455,57 @@ Required: freetype ✔, jpeg ✔, libheif ✔, libomp ✔, libpng ✔, libtiff �
 ```
 Now that we've installed ghostscript and the tiff delegate, let's continue on with our example.
 
-### Other systems
+### Windows 
 
-See the installation instructions in the documentation for these packages to find and install the software on Windows or Linux.
+#### Gather the software packages
+
+- Tesseract: http://digi.bib.uni-mannheim.de/tesseract/tesseract-ocr-setup-4.00.00dev.exe
+- Ghostscript: https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs922/gs922w64.exe
+- Imagemagick: https://imagemagick.org/download/binaries/ImageMagick-7.0.9-26-Q16-x64-dll.exe
+- xpdf: https://xpdfreader-dl.s3.amazonaws.com/XpdfReader-win64-4.00.01.exe https://xpdfreader-dl.s3.amazonaws.com/xpdf-tools-win-4.02.zip
+
+These packages are current as of February 2020.  You'll probably want to grab the most recent versions if you're installing this at a later time. You can find more information in the documentation here:
 
 * Xpdf [documentation](https://www.xpdfreader.com/download.html)
 * tesseract [documention](https://github.com/tesseract-ocr/tesseract/wiki).
 * ImageMagick [documentation](http://www.imagemagick.org/script/command-line-processing.php)
 * Ghostscript [documentation](https://ghostscript.com/doc/9.21/Install.htm)
 
+#### Run the installers for the packages
+
+These packages, with the exception of Xpdf, have installers that you will run similar to installing other Windows software.
+
+#### Unzip Xpdf files and move to a reasonable place
+
+The Xpdf command-line tools didn't have an installer. Per the `INSTALL` file in the zip archive, I copied the files to `C:\Program Files\Xpdf`.
+
+#### Add command-line tools to path
+
+You'll want to add the command-line tools to the system's path so I can type `tesseract` instead of having to type out `C:\Program Files (x86)\Tesseract-OCR\tesseract` each time I want to run the program.
+
+The ImageMagick installer adds its command to the path for you.
+
+For Xpdf and tesseract, you'll have to do this manually. Follow [these instructions](https://www.computerhope.com/issues/ch000549.htm#windows10) to add the locations of the software to your system path. On my system, Tesseract was installed to `C:\Program Files (x86)\Tesseract-OCR`.
+
+### Linux
+
+You'll want to install these tools with your particular distribution's package manager. The package names may be slightly different than with Homebrew or Windows.
+
+## Resources
+
+### Learning the command line
+
+Important!: While command line will be very similar on UNIX-based systems like Mac OS X or Linux, they'll vary widely if you're using Windows. Some things are the same (`cd` to change directories), others are different (`ls` vs. `dir` to show directory contents). Just keep these differences in mind when you're searching for additional help.
+
+At NICAR 2020, AJ Vicens gave the workshop [Command line for reporters](https://ireapps.github.io/nicar-2020-schedule#20200307_command_line_for_reporters_mac_2026_all). It covers the use of the command line on Macs.
+
+Good command-line resources for Windows are harder to find. Mike Stucka made [this tipsheet](https://www.ire.org/resource-center/tipsheets/4956/) for a 2017 NICAR session on the Windows command line.
+[This one](https://www.cs.princeton.edu/courses/archive/spr05/cos126/cmd-prompt.html) is also pretty good. 
+
 ## Sources and references
 
 I created this tutorial for [NICAR 2019]('https://www.ire.org/events-and-training/conferences/nicar-2019') but it relies on many helpful open source resources that deserve credit. They are listed below. Thanks for sharing your work with the rest of the world.
 
-[Tesseract](https://github.com/tesseract-ocr/tesseract/wiki/Command-Line-Usage) documentation
-
-[ImageMagick](https://www.imagemagick.org/script/command-line-processing.php) documentation
-
-[pdftotext](https://www.xpdfreader.com/pdftotext-man.html) documentation
+- [Tesseract](https://github.com/tesseract-ocr/tesseract/wiki/Command-Line-Usage) documentation
+- [ImageMagick](https://www.imagemagick.org/script/command-line-processing.php) documentation
+- [pdftotext](https://www.xpdfreader.com/pdftotext-man.html) documentation
