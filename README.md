@@ -1,13 +1,26 @@
-# nicar_ocr
-A tutorial on extracting text from PDFs and optical character recognition using tesseract, ImageMagick and other open source tools
+# Using OCR to extract data from PDFs
+
+A tutorial on extracting text from PDFs and optical character recognition using tesseract, ImageMagick and other open source tools.
+
+This is based on the [tutorial](https://github.com/chadday/nicar_ocr) by Chad Day and updated for the Windows PC labs at NICAR 2020.
 
 ## Introduction
 
 This class seeks to help you solve a common problem in journalism: Data stored in a computer generated PDF or even worse an image PDF. We'll first walk through how to do some quick text extraction using a command line tool. Then we'll step up to Optical Character Recognition, or OCR, to work on image files.
 
-## Installation
 
-First things first, we need to install the tools we'll be using.
+## Some conventions
+
+We'll use emoji to indicate different kinds of information.
+
+- 🏃: You should run the command in this code cell as part of the tutorial.
+- 🍎: Run this version of the command if you're on a Mac.
+- 🖥: Run this version of the command if you're on a Windows machine.
+- 📕: Don't run the command in this cell. It's just an example for reference.
+
+## The tools 
+
+We're using a number of open source software tools to process our PDFS:
 
 * [Xpdf](https://www.xpdfreader.com/) is an open source toolkit to work with pdfs. We'll be using its tool, [pdftotext](https://www.xpdfreader.com/pdftotext-man.html).
 
@@ -17,41 +30,13 @@ First things first, we need to install the tools we'll be using.
 
 * [Ghostscript](https://www.ghostscript.com/index.html) is an interpreter for PDFs and Adobe's PostScript language.
 
-Since this is a Mac-based class, we'll be following Mac install instructions but you can find Windows and Linux in the following documentation.
-
-* Xpdf [documentation](https://www.xpdfreader.com/download.html)
-* tesseract [documention](https://github.com/tesseract-ocr/tesseract/wiki).
-* ImageMagick [documentation](http://www.imagemagick.org/script/command-line-processing.php)
-* Ghostscript [documentation](https://ghostscript.com/doc/9.21/Install.htm)
-
-For Mac, we'll be using the Homebrew package manager. You can install it [here](). So for tesseract, you will use the following command.
-```
-brew install tesseract
-```
-
-For Xpdf, you will use this.
-```
-brew install xpdf
-```
-
-We will also install libtiff, a dependency for ImageMagick that we will need.
-```
-brew install libtiff
-```
-
-Then we'll install ghostscipt
-```
-brew install ghostscript
-```
-
-And for ImageMagick you will use this.
-```
-brew install imagemagick
-```
-
 ## Files
 
-We'll  be using a number of files for our examples. You can find them in [here](/files).
+We'll be using a number of files for our examples. You can find them in folders corresponding to each of the three scenarios we'll be walking through together:
+
+- `scenario_one`
+- `scenario_two`
+- `scenario_three`
 
 ## Scenario 1: Analyzing a computer generated pdf with embedded text (searchable pdf)
 
@@ -76,13 +61,24 @@ Our [document](files/manafort/Manafort_filing.pdf) has several sections like thi
 
 But since we can tell that there's text underneath there, let's run it through pdftotext and see what comes out.
 
+🏃 To get started, let's change to the directory for this scenario:
+
+```
+cd scenario_one
+```
+
 #### pdftotext command construction
+
+📕 `pdftotext` needs to know the path of the PDF file and the path of the output text:
 
 ```
 pdftotext /path/to/my/file.pdf name-of-my-text-file.txt
 ```
-So for our file it would look something like this.
 
+### Extract text from a PDF
+
+🏃 It's pretty simple to extract all the text in a text PDF to a text file:
+ 
 ```
 pdftotext Manafort_filing.pdf manafort_filing.txt
 ```
@@ -97,11 +93,15 @@ As mentioned before, Tabula is a great tool for getting tabular data out of pdf 
 
 ### pdftotext command for tables
 
+📕 The `-table` option tells `pdftotext` to try to extract tabular text from a PDF and maintain the rows/columns:
+
 ```
 pdftotext -table /path/to/my/file name-of-my-text-file.txt
 ```
 
-We'll test it out on the [file](/files/tabular/07012018-report-final.pdf). You can ```cd``` to it in the ```/files/tabular``` directory.
+We'll test it out on the [file](/files/tabular/07012018-report-final.pdf).
+
+🏃 Run `pdftotext` with the `-table` option to extract the table.
 
 ```
 pdftotext -table 07012018-report-final.pdf tabular-test.txt
@@ -111,7 +111,7 @@ You should get something like this:
 
 ![Alt Text](/imgs/structured.png)
 
-For comparison, try using just pdftotext.
+🏃 For comparison, try using just pdftotext without the `-table` option.
 
 ```
 pdftotext 07012018-report-final.pdf test.txt
@@ -123,31 +123,43 @@ You should get something like this (very bad stuff):
 
 Now that we've walked through the basics of text extraction with computer generated (nice) pdfs, let's go onto the harder use cases.
 
+🏃 Let's change out of the scenario directory so we're ready to move on to the next scenario.
+
+```
+cd ..
+```
+
 ## Scenario 2: Basic text extraction from image files
 
 Extracting text from image files is perhaps one of the most common problems reporters face when they get data from government agencies or are trying to build their own databases from scratch (paper records, the dreaded image pdf of an Excel spreadsheet, etc.) To do this, we use OCR and in this example, Tesseract.
 
+Before we get started, change directoy into the directory for this scenario:
+
+```
+cd scenario_two
+```
+
 #### Basics of tesseract
 
-Tesseract has many options. You can see them by typing:
+🏃 Tesseract has many options. You can see them by typing:
 
 ```
 tesseract -h
 ```
 
-We're not going to go into detail on many of these options but you can read me [here](https://github.com/tesseract-ocr/tesseract/wiki)
+We're not going to go into detail on many of these options but you can read more [here](https://github.com/tesseract-ocr/tesseract/wiki)
 
-The basic command structure looks like this:
+📕 The basic command structure looks like this:
 
 ```
 tesseract imagename outputbase [-l lang] [--oem ocrenginemode] [--psm pagesegmode] [configfiles...]
 ```
 
-Let's look at a single image file. In this case, that's the wh_salaries.png file in our imgs folder. This is the first page of our White House salaries pdf but notice that it is not searchable.
+Let's look at a single image file. In this case, that's the `wh_salaries.png` file in our imgs folder. This is the first page of our White House salaries pdf but notice that it is not searchable.
 
 This is perhaps the most simple use of tesseract. We will feed in our image file and have it output a searchable pdf.
 
-In ```/files/single_img``` directory, use the following command.
+🏃 Run the `tesseract` command to create a searchable PDF from an image:
 
 ```
 tesseract wh_salaries.png out pdf
@@ -157,19 +169,39 @@ You start with a file like this:
 
 ![Alt Text](/imgs/wh_salaries.png)
 
-You should get a file name out.pdf and you can see that it's searchable.
+You should get a file name `out.pdf` and you can see that it's searchable.
 
 ![Alt Text](/imgs/searchable_salaries.png)
 
+🏃 As with the previous scenario, change out of the scenario directory so we're ready to move on to the next scenario:
+
+```
+cd ..
+```
+
 ## Scenario 3: Combining our skills to make a searchable pdf out of an image pdf.
 
-#### Converting pdfs to images to prepare for OCR using ImageMagick
+### Converting pdfs to images to prepare for OCR using ImageMagick
 
 So far, we've covered extracting text from computer generated files and doing some basic OCR. Now, we'll turn to creating searchable pdfs out of image files. To do this, we'll be adding another command line tool called ImageMagick, an image editing and manipulation software.
 
-We will be using the ```convert``` tool from ImageMagick.
+🏃 Before we get started, change directory to the one for this scenario:
 
-ImageMagick has some great documentation that explains all of its many options. You can find it [here](http://www.imagemagick.org/script/command-line-options.php#page)
+```
+cd scenario_three
+```
+
+We will be using the `convert` tool from ImageMagick.
+
+ImageMagick has some great documentation that explains all of its many options. You can find it [here](http://www.imagemagick.org/script/command-line-options.php#page).
+
+📕🖥  The general syntax of the `convert` command on Windows is:
+
+```
+magick convert [options ...] file [ [options ...] file ...] [options ...] file
+```
+
+📕🍎 On a Mac or a Linux system, you can omit the `magick` supercommand: 
 
 ```
 convert [options ...] file [ [options ...] file ...] [options ...] file
@@ -179,9 +211,186 @@ If you're familiar with photography or document scanning, you know that the prop
 
 The general standard for OCR is 300 dpi, or 300 dots per inch, though [ABBYY recommends](https://knowledgebase.abbyy.com/article/489) using 400-600 for font sizes smaller than 10 point. In ImageMagick, this is specified using the density flag. Below we are telling ImageMagick to take our pdf document and convert it to an image with 300 dpi.
 
-#### Important 
+### Example with the image file Russia findings document
 
-Before we go on from here, let's make sure we have the tiff delegate installed. You can check like this:
+![Alt Text](/imgs/Screen%20Shot%202019-03-07%20at%208.51.54%20AM.png)
+
+First, we have to convert it to an image so we can run it through tesseract.
+
+🏃🖥  We'll use ImageMagick's `convert` tool.
+
+```
+magick convert image_pdf_2.pdf russia_findings.tiff
+```
+
+🏃🍎 On a Mac: 
+
+```
+convert image_pdf_2.pdf russia_findings.tiff
+```
+
+On a Mac, an easy way to find the dpi of an image is to use Preview. Open the image in preview, go to ```Tools``` and click ```Show Inspector```.
+
+So let's take a look at our image we just created.
+
+### Finding the DPI of an image
+
+#### On Windows
+
+This can be obtained through the file information Window.
+
+More TK.
+
+#### On a Mac
+
+Open in Preview:
+
+![Alt Text](/imgs/preview.png)
+
+Go to 'Show Inspector':
+
+![Alt Text](/imgs/show_inspector.png)
+
+Look in Inspector pane 1:
+
+![Alt Text](/imgs/inspector_1.png)
+
+Look in Inspector pane 2:
+
+![Alt Text](/imgs/inspector_2.png)
+
+### Increasing the DPI
+
+So our dpi is ```72```, which likely is fine for this document but let's go ahead and up that using convert. This will increase the file size of the tiff we create (so warning about file bloat) but it's only a temporary file that we're using to get the best text recognition.
+
+🏃🖥  Let's do this with our Russia document.
+
+```
+magick convert -density 300 image_pdf_2.pdf -depth 8 -strip -background white -alpha off russia_findings.tiff
+```
+
+🏃🍎 On a Mac, this would be:
+
+```
+convert -density 300 image_pdf_2.pdf -depth 8 -strip -background white -alpha off russia_findings.tiff
+```
+
+So let's break this down.
+
+`convert` - invokes ImageMagick's convert tool
+
+`-density` - ups the dpi of our image to 300
+
+`russia_finding.pdf` - our file that we're converting to an image.
+
+`-depth 8` - "This the number of bits in a color sample within a pixel. Use this option to specify the depth of raw images whose depth is unknown such as GRAY, RGB, or CMYK, or to change the depth of any image after it has been read", according to ImageMagick documentation.
+
+`-strip` - strips off any junk on the file (profiles, comments, etc.)
+
+`-background white` - sets the background to white to help with contrasting our text
+
+`-alpha off` -generally the transparency of the image. A great explanation [here](https://www.quora.com/What-exactly-is-an-alpha-channel-in-an-image)
+
+#### Now we run this TIFF through tesseract
+
+🏃 Run the extracted image through tesseract to create a searchable text PDF.
+
+```
+tesseract russia_findings.tiff -l eng russia_findings_enh pdf
+```
+
+And you've got a searchable PDF!
+
+🏃 Let's take a look at the underlying text now.
+
+```
+pdftotext russia_findings_enh.pdf russia_text.txt
+```
+
+📕 We also could have just outputted directly to a text file like this.
+
+```
+tesseract russia_findings.tiff -l eng russia_findings_enh txt
+```
+
+## Where to go from here
+
+OCRing is not a perfect science and most of the time, it isn't simple. One recent example: public financial disclosures of federal judges are multi-page documents but they are released as extremely long, single tiff files. You can find a similar test file [here](https://drive.google.com/open?id=11YpC2-0yYyuJL7AJnvG48q9H8hrrDQon)
+
+![Alt Text](/imgs/Walker16.png)
+
+And you'll notice that the pages need to be split.
+
+![Alt Text](/imgs/Walker16_pages.png)
+
+The workflow below walks through one example of how to solve the problem using ImageMagick and Tesseract.
+
+📕 This blows up the images, adjusts the image resolution, ups the contrast to help bring out the text. It then outputs a grayscale version, set at 8-bit depth, named Walker16_enh.tiff.
+
+```
+convert -resize 400% -density 450 -brightness-contrast 5x0 Walker16.tiff -set colorspace Gray -separate -average -depth 8 -strip Walker16_enh.tiff
+```
+
+Next we use ImageMagick's crop to split it up into a multi-page pdf. 
+
+To find the dimensions, first use Preview's Inspector tool. You 'll see the dimensions of the entire image file. (NOTE: This screenshot is from a different file since I added this later.)
+
+![Alt Text](/imgs/find_inspector.png)
+
+The first value is the width and the second value is the length. To get the pixel length of each page, just divide by the number of pages you should have in the final file.
+
+![Alt Text](/imgs/dimensions.png)
+
+📕 
+
+```
+convert Walker16_enh.tiff -crop 3172x4200 Walker16_to_ocr.tiff
+```
+
+📕 Then we convert that image into a searchable pdf.
+
+```
+tesseract Walker16_to_ocr.tiff -l eng Walker16 pdf
+```
+
+Exploring the various options and fine-tuning your skills with ImageMagick can help prepare you for the next big step: Batch processing of documents, which you can hear more about [here at NICAR](https://www.ire.org/events-and-training/event/3433/4227/).
+
+## Installation on your own system
+
+If you want to run the tutorial on your machine, you'll need to install Xpdf, tesseract, ImageMagick and possibly Ghostscript on your computer.
+
+### Mac
+
+For Mac, we'll be using the Homebrew package manager.
+
+📕🍎  To install tesseract, you will use the following command.
+```
+brew install tesseract
+```
+
+📕🍎 For Xpdf, you will use this.
+```
+brew install xpdf
+```
+
+📕🍎 We will also install libtiff, a dependency for ImageMagick that we will need.
+```
+brew install libtiff
+```
+
+📕🍎 Then we'll install ghostscipt
+```
+brew install ghostscript
+```
+
+📕🍎 And for ImageMagick you will use this.
+```
+brew install imagemagick
+```
+
+#### Making sure the TIFF delegate is installed. 
+
+📕🍎 Before we go on from here, let's make sure we have the tiff delegate installed. You can check like this:
 
 ```
 convert -list configure
@@ -197,23 +406,18 @@ DELEGATES      bzlib mpeg freetype jng jpeg lzma png tiff xml zlib
 
 #### IF you don't have tiff in the list, follow these steps:
 
-First check to make sure that libtiff and ghostscript are installed. You can do this by running
+📕🍎 First check to make sure that libtiff is installed. You can do this by running
 
 ```
 brew list
 ```
 
-If ghostscript is not in the list, then install it using brew.
-```
-brew install ghostscript
-```
-
-If libtiff is not in the list, then install it using brew.
+📕🍎 If libtiff is not in the list, then install it using brew.
 ```
 brew install libtiff
 ```
 
-Now check to make sure that imagemagick is recognizing libtiff is installed as a dependency.
+📕🍎 Now check to make sure that imagemagick is recognizing libtiff is installed as a dependency.
 ```
 brew info imagemagick
 ```
@@ -227,124 +431,17 @@ Required: freetype ✔, jpeg ✔, libheif ✔, libomp ✔, libpng ✔, libtiff �
 ```
 Now that we've installed ghostscript and the tiff delegate, let's continue on with our example.
 
-#### Example with the image file Russia findings document
+### Other systems
 
-![Alt Text](/imgs/Screen%20Shot%202019-03-07%20at%208.51.54%20AM.png)
+See the installation instructions in the documentation for these packages to find and install the software on Windows or Linux.
 
-First, we have to convert it to an image so we can run it through tesseract.
-
-We'll use ImageMagick's ```convert``` tool.
-
-```
-convert russia_findings.pdf russia_findings.tiff
-```
-
-On a Mac, an easy way to find the dpi of an image is to use Preview. Open the image in preview, go to ```Tools``` and click ```Show Inspector```.
-
-So let's take a look at our image we just created.
-
-#### Open in Preview
-
-![Alt Text](/imgs/preview.png)
-
-#### Go to 'Show Inspector'
-
-![Alt Text](/imgs/show_inspector.png)
-
-#### Inspector pane 1
-
-![Alt Text](/imgs/inspector_1.png)
-
-#### Inspector pane 2
-
-![Alt Text](/imgs/inspector_2.png)
-
-So our dpi is ```72```, which likely is fine for this document but let's go ahead and up that using convert. This will increase the file size of the tiff we create (so warning about file bloat) but it's only a temporary file that we're using to get the best text recognition.
-
-Let's do this with our Russia document.
-
-```
-convert -density 300 russia_findings.pdf -depth 8 -strip -background white -alpha off russia_findings.tiff
-```
-
-So let's break this down.
-
-```convert``` - invokes ImageMagick's convert tool
-
-```-density``` - ups the dpi of our image to 300
-
-```russia_finding.pdf ``` - our file that we're converting to an image.
-
-```-depth 8``` - "This the number of bits in a color sample within a pixel. Use this option to specify the depth of raw images whose depth is unknown such as GRAY, RGB, or CMYK, or to change the depth of any image after it has been read", according to ImageMagick documentation.
-
-```-strip``` - strips off any junk on the file (profiles, comments, etc.)
-
-```-background white``` - sets the background to white to help with contrasting our text
-
-```-alpha off``` -generally the transparency of the image. A great explanation [here](https://www.quora.com/What-exactly-is-an-alpha-channel-in-an-image)
-
-#### Now we run this tiff through tesseract
-
-```
-tesseract russia_findings.tiff -l eng russia_findings_enh pdf
-```
-
-And you've got a searchable pdf!
-
-
-Let's take a look at the underlying text now.
-
-```
-pdftotext russia_findings_enh.pdf russia_text.txt
-```
-
-We also could have just outputted directly to a text file like this.
-
-```
-tesseract russia_findings.tiff -l eng russia_findings_enh txt
-```
-
-## Where to go from here:
-
-OCRing is not a perfect science and most of the time, it isn't simple. One recent example: public financial disclosures of federal judges are multi-page documents but they are released as extremely long, single tiff files. You can find a similar test file [here](https://drive.google.com/open?id=11YpC2-0yYyuJL7AJnvG48q9H8hrrDQon)
-
-![Alt Text](/imgs/Walker16.png)
-
-And you'll notice that the pages need to be split.
-
-![Alt Text](/imgs/Walker16_pages.png)
-
-The workflow below walks through one example of how to solve the problem using ImageMagick and Tesseract.
-
-This blows up the images, adjusts the image resolution, ups the contrast to help bring out the text. It then outputs a grayscale version, set at 8-bit depth, named Walker16_enh.tiff.
-```
-convert -resize 400% -density 450 -brightness-contrast 5x0 Walker16.tiff -set colorspace Gray -separate -average -depth 8 -strip Walker16_enh.tiff
-```
-
-Next we use ImageMagick's crop to split it up into a multi-page pdf. 
-
-To find the dimensions, first use Preview's Inspector tool. You 'll see the dimensions of the entire image file. (NOTE: This screenshot is from a different file since I added this later.)
-
-![Alt Text](/imgs/find_inspector.png)
-
-The first value is the width and the second value is the length. To get the pixel length of each page, just divide by the number of pages you should have in the final file.
-
-![Alt Text](/imgs/dimensions.png)
-
-```
-convert Walker16_enh.tiff -crop 3172x4200 Walker16_to_ocr.tiff
-```
-
-Then we convert that image into a searchable pdf.
-
-```
-tesseract Walker16_to_ocr.tiff -l eng Walker16 pdf
-```
-
-Exploring the various options and fine-tuning your skills with ImageMagick can help prepare you for the next big step: Batch processing of documents, which you can hear more about [here at NICAR](https://www.ire.org/events-and-training/event/3433/4227/).
-
+* Xpdf [documentation](https://www.xpdfreader.com/download.html)
+* tesseract [documention](https://github.com/tesseract-ocr/tesseract/wiki).
+* ImageMagick [documentation](http://www.imagemagick.org/script/command-line-processing.php)
+* Ghostscript [documentation](https://ghostscript.com/doc/9.21/Install.htm)
 
 ## Sources and references
+
 I created this tutorial for [NICAR 2019]('https://www.ire.org/events-and-training/conferences/nicar-2019') but it relies on many helpful open source resources that deserve credit. They are listed below. Thanks for sharing your work with the rest of the world.
 
 [Tesseract](https://github.com/tesseract-ocr/tesseract/wiki/Command-Line-Usage) documentation
