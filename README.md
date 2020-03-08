@@ -237,9 +237,17 @@ So let's take a look at our image we just created.
 
 #### On Windows
 
-This can be obtained through the file information Window.
+This can be obtained through the file properties Window.
 
-More TK.
+Right-click on the file name in Explorer to get the context menu.
+
+Click `Properties` from the context menu.
+
+Click on the `Details` tab.
+
+Scroll down to the `Image` section.
+
+Look for the `Horizontal resolution` and `Vertical resolution` labels.
 
 #### On a Mac
 
